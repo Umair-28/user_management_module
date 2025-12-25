@@ -5,7 +5,7 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_create_user']" position="replace">
+            <xpath expr="//button[@name='action_create_user']" position="before">
                 <button
                     string="Create User (Password)"
                     type="object"
