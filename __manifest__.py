@@ -25,7 +25,7 @@ Features:
     ],
     "data": [
         "security/ir.model.access.csv",
-        "data/hr_user_role_data.xml",
+        # "data/hr_user_role_data.xml",
         "views/create_user_wizard_view.xml",
         "views/hr_employee_view.xml",
         "views/hr_user_role_views.xml",
