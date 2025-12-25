@@ -11,7 +11,8 @@
                     <field name="password" password="True"/>
                     <field name="confirm_password" password="True"/>
                 </group>
-                <group string="Access Rights">
+                <group string="Role &amp; Access Rights">
+                    <field name="role_id" placeholder="Select a role..."/>
                     <field name="groups_id" widget="many2many_tags" nolabel="1"/>
                 </group>
                 <footer>
@@ -28,27 +29,29 @@
 </odoo>
 <!-- <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-<record id="view_hr_create_user_wizard" model="ir.ui.view">
-    <field name="name">hr.create.user.wizard.form</field>
-    <field name="model">hr.create.user.wizard</field>
-    <field name="arch" type="xml">
-        <form string="Create User">
-            <group>
-                <field name="employee_id"/>
-                <field name="login"/>
-                <field name="password" password="True"/>
-                <field name="confirm_password" password="True"/>
-            </group>
-            <footer>
-                <button
-                    string="Create User"
-                    type="object"
-                    name="action_create_user"
-                    class="btn-primary"/>
-                <button string="Cancel" special="cancel"/>
-            </footer>
-        </form>
-    </field>
-</record>
-</odoo>
- -->
+    <record id="view_hr_create_user_wizard" model="ir.ui.view">
+        <field name="name">hr.create.user.wizard.form</field>
+        <field name="model">hr.create.user.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create User">
+                <group>
+                    <field name="employee_id"/>
+                    <field name="login"/>
+                    <field name="password" password="True"/>
+                    <field name="confirm_password" password="True"/>
+                </group>
+                <group string="Access Rights">
+                    <field name="groups_id" widget="many2many_tags" nolabel="1"/>
+                </group>
+                <footer>
+                    <button
+                        string="Create User"
+                        type="object"
+                        name="action_create_user"
+                        class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo> -->

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Role list View -->
+    <record id="view_hr_user_role_list" model="ir.ui.view">
+        <field name="name">hr.user.role.list</field>
+        <field name="model">hr.user.role</field>
+        <field name="arch" type="xml">
+            <list string="User Roles">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Role Form View -->
+    <record id="view_hr_user_role_form" model="ir.ui.view">
+        <field name="name">hr.user.role.form</field>
+        <field name="model">hr.user.role</field>
+        <field name="arch" type="xml">
+            <form string="User Role">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="active" widget="boolean_toggle"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Access Rights">
+                            <field name="groups_id" widget="many2many_tags">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="category_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Role Action -->
+    <record id="action_hr_user_role" model="ir.actions.act_window">
+        <field name="name">User Roles</field>
+        <field name="res_model">hr.user.role</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first User Role
+            </p>
+            <p>
+                Define roles with predefined access rights to simplify user creation.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem
+        id="menu_hr_user_role"
+        name="User Roles"
+        parent="hr.menu_hr_configuration"
+        action="action_hr_user_role"
+        sequence="50"/>
+</odoo>
