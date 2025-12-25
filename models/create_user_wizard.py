@@ -19,6 +19,17 @@ class HrCreateUserWizard(models.TransientModel):
         help="Select the access rights/groups for this user"
     )
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super(HrCreateUserWizard, self).default_get(fields_list)
+        
+        # Add default Employee group
+        employee_group = self.env.ref('base.group_user', raise_if_not_found=False)
+        if employee_group and 'groups_id' in fields_list:
+            res['groups_id'] = [(6, 0, [employee_group.id])]
+        
+        return res
+
     def action_create_user(self):
         self.ensure_one()
 
