@@ -1,14 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- Role Kanban View -->
+    <record id="view_hr_user_role_kanban" model="ir.ui.view">
+        <field name="name">hr.user.role.kanban</field>
+        <field name="model">hr.user.role</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="user_count"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <div class="o_kanban_record_subtitle">
+                                        <field name="description"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge rounded-pill">
+                                            <i class="fa fa-users"/> <field name="user_count"/> Users
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <!-- Role list View -->
     <record id="view_hr_user_role_list" model="ir.ui.view">
         <field name="name">hr.user.role.list</field>
         <field name="model">hr.user.role</field>
         <field name="arch" type="xml">
-            <list string="User Roles">
+            <list string="User Roles" multi_edit="1">
                 <field name="sequence" widget="handle"/>
-                <field name="name"/>
+                <field name="name" readonly="1"/>
                 <field name="description"/>
+                <field name="user_count"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
             </list>
         </field>
     </record>
@@ -19,28 +60,56 @@
         <field name="model">hr.user.role</field>
         <field name="arch" type="xml">
             <form string="User Role">
+                <header>
+                    <button name="action_view_users" 
+                            type="object" 
+                            string="View Users" 
+                            class="btn-primary"
+                            invisible="user_count == 0"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <field name="active" widget="boolean_toggle"/>
+                        <button name="action_view_users" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-users"
+                                invisible="user_count == 0">
+                            <field name="user_count" widget="statinfo" string="Users"/>
+                        </button>
                     </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
                     <group>
                         <group>
-                            <field name="name"/>
+                            <field name="name" placeholder="e.g., HR Manager, Accountant, Sales Person"/>
                             <field name="sequence"/>
-                            <field name="color" widget="color_picker"/>
                         </group>
                         <group>
-                            <field name="description"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="description" placeholder="Brief description of this role and its responsibilities..."/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Access Rights">
-                            <field name="groups_id" widget="many2many_tags">
-                                <list>
-                                    <field name="name"/>
+                        <page string="Access Rights" name="access_rights">
+                            <group>
+                                <group string="Select Groups" colspan="2">
+                                    <p class="text-muted">
+                                        Select the access groups for this role. Users assigned this role will receive all selected access rights.
+                                    </p>
+                                </group>
+                            </group>
+                            <field name="groups_id" nolabel="1">
+                                <list editable="bottom" create="0" delete="1">
                                     <field name="category_id"/>
+                                    <field name="name"/>
+                                    <field name="comment"/>
                                 </list>
                             </field>
+                        </page>
+                        <page string="Access Rights (Tags)" name="access_rights_tags">
+                            <group>
+                                <field name="groups_id" widget="many2many_tags" nolabel="1"/>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>
@@ -48,17 +117,39 @@
         </field>
     </record>
 
+    <!-- Role Search View -->
+    <record id="view_hr_user_role_search" model="ir.ui.view">
+        <field name="name">hr.user.role.search</field>
+        <field name="model">hr.user.role</field>
+        <field name="arch" type="xml">
+            <search string="User Roles">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="groups_id"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Active Status" name="group_active" context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <!-- Role Action -->
     <record id="action_hr_user_role" model="ir.actions.act_window">
         <field name="name">User Roles</field>
         <field name="res_model">hr.user.role</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_hr_user_role_search"/>
+        <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first User Role
             </p>
             <p>
                 Define roles with predefined access rights to simplify user creation.
+                <br/>
+                Click the <strong>Create</strong> button to add a new role.
             </p>
         </field>
     </record>

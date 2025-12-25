@@ -7,13 +7,19 @@
             <form string="Create User">
                 <group>
                     <field name="employee_id"/>
-                    <field name="login"/>
-                    <field name="password" password="True"/>
-                    <field name="confirm_password" password="True"/>
+                    <field name="login" placeholder="user@example.com"/>
+                    <field name="password" password="True" placeholder="Enter password"/>
+                    <field name="confirm_password" password="True" placeholder="Re-enter password"/>
                 </group>
                 <group string="Role &amp; Access Rights">
-                    <field name="role_id" placeholder="Select a role..."/>
-                    <field name="groups_id" widget="many2many_tags" nolabel="1"/>
+                    <field name="role_id" 
+                           placeholder="Select a predefined role..." 
+                           options="{'no_create': True, 'no_open': True}"/>
+                    <field name="groups_id" 
+                           widget="many2many_tags" 
+                           nolabel="1"
+                           placeholder="Or select individual access rights..."
+                           options="{'color_field': 'color', 'no_create': True}"/>
                 </group>
                 <footer>
                     <button
