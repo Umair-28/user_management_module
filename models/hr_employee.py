@@ -5,7 +5,7 @@ class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
     def action_unlink_user(self):
-        """Unlink the user from the employee"""
+        """Unlink and delete the user from the employee"""
         self.ensure_one()
         
         if not self.user_id:
@@ -13,9 +13,13 @@ class HrEmployee(models.Model):
         
         # Store user name for confirmation message
         user_name = self.user_id.name
+        user_to_delete = self.user_id
         
-        # Unlink the user
+        # Unlink the user from employee first
         self.write({'user_id': False})
+        
+        # Delete the user
+        user_to_delete.sudo().unlink()
         
         # Return action to reload the current record
         return {
@@ -28,8 +32,8 @@ class HrEmployee(models.Model):
             'context': {
                 'display_notification': {
                     'type': 'success',
-                    'title': 'User Unlinked',
-                    'message': f'User "{user_name}" has been unlinked from this employee.',
+                    'title': 'User Deleted',
+                    'message': f'User "{user_name}" has been deleted.',
                     'sticky': False,
                 }
             }
