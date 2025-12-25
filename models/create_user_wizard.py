@@ -23,10 +23,31 @@ class HrCreateUserWizard(models.TransientModel):
     def default_get(self, fields_list):
         res = super(HrCreateUserWizard, self).default_get(fields_list)
         
-        # Add default Employee group
-        employee_group = self.env.ref('base.group_user', raise_if_not_found=False)
-        if employee_group and 'groups_id' in fields_list:
-            res['groups_id'] = [(6, 0, [employee_group.id])]
+        if 'groups_id' in fields_list:
+            default_groups = []
+            
+            # Get base employee group (required)
+            employee_group = self.env.ref('base.group_user', raise_if_not_found=False)
+            if employee_group:
+                default_groups.append(employee_group.id)
+            
+            # Exclude patterns for admin/manager groups
+            exclude_keywords = ['admin', 'manager', 'system', 'erp_manager', 'settings']
+            
+            # Find all user-level groups (basic access groups)
+            all_groups = self.env['res.groups'].search([
+                ('name', 'ilike', 'user'),
+                ('name', 'not ilike', 'portal'),
+                ('name', 'not ilike', 'public'),
+            ])
+            
+            for group in all_groups:
+                # Exclude admin/manager level groups
+                if not any(keyword in group.name.lower() for keyword in exclude_keywords):
+                    default_groups.append(group.id)
+            
+            if default_groups:
+                res['groups_id'] = [(6, 0, list(set(default_groups)))]  # Remove duplicates
         
         return res
 
