@@ -45,7 +45,7 @@ class HrCreateUserWizard(models.TransientModel):
             group_ids.append(base_user.id)
         
         if role == 'hr':
-            # HR Groups
+            # HR Groups - Main HR Module
             hr_groups = self.env['res.groups'].search([
                 '|',
                 ('name', 'in', ['Officer', 'HR Officer', 'Manager']),
@@ -54,6 +54,108 @@ class HrCreateUserWizard(models.TransientModel):
                 ('name', '!=', 'Administrator')
             ])
             group_ids.extend(hr_groups.ids)
+            
+            # Time Off / Leaves Management
+            timeoff_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Time Off'),
+                ('name', 'in', ['Officer', 'Manager', 'User'])
+            ])
+            group_ids.extend(timeoff_groups.ids)
+            
+            # Attendance
+            attendance_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Attendances'),
+                ('name', 'in', ['Officer', 'Manager'])
+            ])
+            group_ids.extend(attendance_groups.ids)
+            
+            # Recruitment
+            recruitment_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Recruitment'),
+                ('name', 'in', ['Officer', 'User'])
+            ])
+            group_ids.extend(recruitment_groups.ids)
+            
+            # Appraisal
+            appraisal_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Appraisals'),
+                ('name', 'in', ['User', 'Manager', 'Officer'])
+            ])
+            group_ids.extend(appraisal_groups.ids)
+            
+            # Payroll (if installed)
+            payroll_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Payroll'),
+                ('name', 'in', ['User', 'Officer'])
+            ])
+            group_ids.extend(payroll_groups.ids)
+            
+            # Expenses
+            expense_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Expenses'),
+                ('name', 'in', ['User', 'Team Approver', 'Manager'])
+            ])
+            group_ids.extend(expense_groups.ids)
+            
+            # Fleet Management
+            fleet_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Fleet'),
+                ('name', 'in', ['User', 'Officer', 'Manager'])
+            ])
+            group_ids.extend(fleet_groups.ids)
+            
+            # Referral (Employee Referral)
+            referral_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Referral'),
+            ])
+            group_ids.extend(referral_groups.ids)
+            
+            # Contracts (HR Contracts)
+            contract_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Contracts'),
+                ('name', 'in', ['User', 'Manager'])
+            ])
+            group_ids.extend(contract_groups.ids)
+            
+            # Skills Management
+            skills_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Skills'),
+            ])
+            group_ids.extend(skills_groups.ids)
+            
+            # Planning/Schedule (if installed)
+            planning_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Planning'),
+                ('name', 'in', ['User', 'Manager'])
+            ])
+            group_ids.extend(planning_groups.ids)
+            
+            # Timesheet (for HR tracking employee hours)
+            timesheet_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Timesheets'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(timesheet_groups.ids)
+            
+            # Additional specific HR groups by XML ID (more reliable)
+            hr_xmlid_groups = [
+                'hr.group_hr_user',              # HR User
+                'hr_holidays.group_hr_holidays_user',  # Time Off User
+                'hr_attendance.group_hr_attendance',   # Attendance User
+                'hr_recruitment.group_hr_recruitment_user',  # Recruitment User
+                'hr_appraisal.group_hr_appraisal_user',      # Appraisal User
+                'hr_expense.group_hr_expense_user',          # Expense User
+                'fleet.fleet_group_user',                    # Fleet User
+                'hr_contract.group_hr_contract_manager',     # Contract Manager
+            ]
+            
+            for xmlid in hr_xmlid_groups:
+                try:
+                    group = self.env.ref(xmlid, raise_if_not_found=False)
+                    if group:
+                        group_ids.append(group.id)
+                except:
+                    pass
             
         elif role == 'accountant':
             # Accounting Groups
@@ -71,11 +173,31 @@ class HrCreateUserWizard(models.TransientModel):
             if invoicing:
                 group_ids.append(invoicing.id)
                 
+            # Billing
+            billing_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Invoicing'),
+            ])
+            group_ids.extend(billing_groups.ids)
+            
+            # Additional accounting groups
+            accounting_xmlid_groups = [
+                'account.group_account_user',      # Accountant User
+                'account.group_account_readonly',  # Show Accounting
+            ]
+            
+            for xmlid in accounting_xmlid_groups:
+                try:
+                    group = self.env.ref(xmlid, raise_if_not_found=False)
+                    if group:
+                        group_ids.append(group.id)
+                except:
+                    pass
+                
         elif role == 'sales':
             # Sales Groups
             sales_groups = self.env['res.groups'].search([
                 '|',
-                ('name', 'in', ['User: Own Documents Only', 'User: All Documents', 'Administrator']),
+                ('name', 'in', ['User: Own Documents Only', 'User: All Documents', 'User']),
                 '&',
                 ('category_id.name', '=', 'Sales'),
                 ('name', '!=', 'Administrator')
@@ -86,6 +208,34 @@ class HrCreateUserWizard(models.TransientModel):
             crm_user = self.env.ref('crm.group_use_lead', raise_if_not_found=False)
             if crm_user:
                 group_ids.append(crm_user.id)
+                
+            # CRM Groups
+            crm_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'CRM'),
+                ('name', 'in', ['User', 'User: All Documents'])
+            ])
+            group_ids.extend(crm_groups.ids)
+            
+            # Point of Sale (if needed for sales)
+            pos_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Point of Sale'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(pos_groups.ids)
+            
+            # Additional sales groups
+            sales_xmlid_groups = [
+                'sales_team.group_sale_salesman',           # Salesperson
+                'sales_team.group_sale_salesman_all_leads', # See All Leads
+            ]
+            
+            for xmlid in sales_xmlid_groups:
+                try:
+                    group = self.env.ref(xmlid, raise_if_not_found=False)
+                    if group:
+                        group_ids.append(group.id)
+                except:
+                    pass
                 
         elif role == 'purchase':
             # Purchase Groups
@@ -98,6 +248,19 @@ class HrCreateUserWizard(models.TransientModel):
             ])
             group_ids.extend(purchase_groups.ids)
             
+            # Additional purchase groups
+            purchase_xmlid_groups = [
+                'purchase.group_purchase_user',  # Purchase User
+            ]
+            
+            for xmlid in purchase_xmlid_groups:
+                try:
+                    group = self.env.ref(xmlid, raise_if_not_found=False)
+                    if group:
+                        group_ids.append(group.id)
+                except:
+                    pass
+                
         elif role == 'warehouse':
             # Warehouse/Inventory Groups
             warehouse_groups = self.env['res.groups'].search([
@@ -109,6 +272,20 @@ class HrCreateUserWizard(models.TransientModel):
             ])
             group_ids.extend(warehouse_groups.ids)
             
+            # Additional warehouse groups
+            warehouse_xmlid_groups = [
+                'stock.group_stock_user',     # Inventory User
+                'stock.group_stock_multi_locations',  # Multi Locations
+            ]
+            
+            for xmlid in warehouse_xmlid_groups:
+                try:
+                    group = self.env.ref(xmlid, raise_if_not_found=False)
+                    if group:
+                        group_ids.append(group.id)
+                except:
+                    pass
+                
         elif role == 'inventory':
             # Inventory User
             inventory_user = self.env.ref('stock.group_stock_user', raise_if_not_found=False)
