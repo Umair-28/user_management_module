@@ -17,14 +17,21 @@ class HrEmployee(models.Model):
         # Unlink the user
         self.write({'user_id': False})
         
+        # Return action to reload the current record
         return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': 'User Unlinked',
-                'message': f'User "{user_name}" has been unlinked from this employee.',
-                'type': 'success',
-                'sticky': False,
+            'type': 'ir.actions.act_window',
+            'res_model': 'hr.employee',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_type': 'form',
+            'target': 'current',
+            'context': {
+                'display_notification': {
+                    'type': 'success',
+                    'title': 'User Unlinked',
+                    'message': f'User "{user_name}" has been unlinked from this employee.',
+                    'sticky': False,
+                }
             }
         }
 
