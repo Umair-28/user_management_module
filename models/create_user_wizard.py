@@ -39,14 +39,22 @@ class HrCreateUserWizard(models.TransientModel):
         if not self.login:
             raise UserError("Login is required.")
 
-        # Create user with password and groups
-        user = self.env["res.users"].sudo().create({
+        # Prepare user values
+        user_vals = {
             "name": self.employee_id.name,
             "login": self.login,
             "email": self.login,
             "password": self.password,
-            "groups_id": [(6, 0, self.groups_id.ids)],  # Set groups
-        })
+        }
+
+        # Create user with password
+        user = self.env["res.users"].sudo().create(user_vals)
+
+        # Set groups separately after user creation
+        if self.groups_id:
+            user.sudo().write({
+                "groups_id": [(6, 0, self.groups_id.ids)]
+            })
 
         # Link employee to user
         self.employee_id.sudo().write({
