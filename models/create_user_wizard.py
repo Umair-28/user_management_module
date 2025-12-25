@@ -158,7 +158,7 @@ class HrCreateUserWizard(models.TransientModel):
                     pass
             
         elif role == 'accountant':
-            # Accounting Groups
+            # Accounting Groups - Main Accounting Module
             accounting_groups = self.env['res.groups'].search([
                 '|',
                 ('name', 'in', ['Billing', 'Adviser', 'Accountant']),
@@ -168,21 +168,77 @@ class HrCreateUserWizard(models.TransientModel):
             ])
             group_ids.extend(accounting_groups.ids)
             
-            # Add Invoicing group
-            invoicing = self.env.ref('account.group_account_invoice', raise_if_not_found=False)
-            if invoicing:
-                group_ids.append(invoicing.id)
-                
-            # Billing
-            billing_groups = self.env['res.groups'].search([
+            # Invoicing/Billing
+            invoicing_groups = self.env['res.groups'].search([
                 ('category_id.name', '=', 'Invoicing'),
             ])
-            group_ids.extend(billing_groups.ids)
+            group_ids.extend(invoicing_groups.ids)
             
-            # Additional accounting groups
+            # Payment
+            payment_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Payment'),
+            ])
+            group_ids.extend(payment_groups.ids)
+            
+            # Expenses (Accountant needs to approve/process expenses)
+            expense_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Expenses'),
+                ('name', 'in', ['User', 'Team Approver', 'All Approver', 'Manager'])
+            ])
+            group_ids.extend(expense_groups.ids)
+            
+            # Assets Management (Fixed Assets)
+            asset_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Assets'),
+            ])
+            group_ids.extend(asset_groups.ids)
+            
+            # Budget Management
+            budget_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Budget'),
+            ])
+            group_ids.extend(budget_groups.ids)
+            
+            # Analytic Accounting
+            analytic_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Analytic Accounting'),
+            ])
+            group_ids.extend(analytic_groups.ids)
+            
+            # Documents (Financial Documents)
+            documents_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Documents'),
+                ('name', 'in', ['User', 'Manager'])
+            ])
+            group_ids.extend(documents_groups.ids)
+            
+            # Sign (Document Signing for financial docs)
+            sign_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Sign'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(sign_groups.ids)
+            
+            # Studio (if accountants need to customize views)
+            # studio_groups = self.env['res.groups'].search([
+            #     ('category_id.name', '=', 'Studio'),
+            # ])
+            # group_ids.extend(studio_groups.ids)
+            
+            # Additional accounting groups by XML ID (more reliable)
             accounting_xmlid_groups = [
-                'account.group_account_user',      # Accountant User
-                'account.group_account_readonly',  # Show Accounting
+                'account.group_account_user',           # Accountant User
+                'account.group_account_readonly',       # Show Accounting
+                'account.group_account_invoice',        # Billing
+                'account_accountant.group_account_accountant',  # Accountant (Full Access)
+                'account.group_account_manager',        # Billing Manager
+                'analytic.group_analytic_accounting',   # Analytic Accounting
+                'account.group_warning_account',        # Warnings in Accounting
+                'account_payment.group_account_payment', # Payment
+                'account_asset.group_account_assets',   # Assets Management
+                'hr_expense.group_hr_expense_team_approver',  # Expense Team Approver
+                'hr_expense.group_hr_expense_manager',        # Expense Manager
+                'account_budget.group_account_budget',  # Budget Management
             ]
             
             for xmlid in accounting_xmlid_groups:
@@ -194,7 +250,7 @@ class HrCreateUserWizard(models.TransientModel):
                     pass
                 
         elif role == 'sales':
-            # Sales Groups
+            # Sales Groups - Main Sales Module
             sales_groups = self.env['res.groups'].search([
                 '|',
                 ('name', 'in', ['User: Own Documents Only', 'User: All Documents', 'User']),
@@ -204,29 +260,161 @@ class HrCreateUserWizard(models.TransientModel):
             ])
             group_ids.extend(sales_groups.ids)
             
-            # Add CRM User group
-            crm_user = self.env.ref('crm.group_use_lead', raise_if_not_found=False)
-            if crm_user:
-                group_ids.append(crm_user.id)
-                
-            # CRM Groups
+            # CRM Groups - Customer Relationship Management
             crm_groups = self.env['res.groups'].search([
                 ('category_id.name', '=', 'CRM'),
-                ('name', 'in', ['User', 'User: All Documents'])
+                ('name', 'in', ['User', 'User: All Documents', 'User: Own Documents Only'])
             ])
             group_ids.extend(crm_groups.ids)
             
-            # Point of Sale (if needed for sales)
+            # Point of Sale (POS)
             pos_groups = self.env['res.groups'].search([
                 ('category_id.name', '=', 'Point of Sale'),
                 ('name', 'in', ['User'])
             ])
             group_ids.extend(pos_groups.ids)
             
-            # Additional sales groups
+            # Quotations/Sales Orders
+            quotation_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Quotations'),
+            ])
+            group_ids.extend(quotation_groups.ids)
+            
+            # Subscriptions (Recurring Sales)
+            subscription_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Subscriptions'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(subscription_groups.ids)
+            
+            # eCommerce (if sales manage online store)
+            ecommerce_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'eCommerce'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(ecommerce_groups.ids)
+            
+            # Rental (Product Rental Management)
+            rental_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Rental'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(rental_groups.ids)
+            
+            # Marketing Automation (for sales campaigns)
+            marketing_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Marketing Automation'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(marketing_groups.ids)
+            
+            # Email Marketing
+            email_marketing_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Email Marketing'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(email_marketing_groups.ids)
+            
+            # SMS Marketing
+            sms_marketing_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'SMS Marketing'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(sms_marketing_groups.ids)
+            
+            # Social Marketing
+            social_marketing_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Social Marketing'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(social_marketing_groups.ids)
+            
+            # Events (Event Management for sales events)
+            event_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Events'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(event_groups.ids)
+            
+            # Surveys (Customer surveys and feedback)
+            survey_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Surveys'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(survey_groups.ids)
+            
+            # Appointments (Customer meeting scheduling)
+            appointment_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Appointments'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(appointment_groups.ids)
+            
+            # Helpdesk (Customer support for sales)
+            helpdesk_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Helpdesk'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(helpdesk_groups.ids)
+            
+            # Live Chat (Customer engagement)
+            livechat_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Live Chat'),
+                ('name', 'in', ['User', 'Officer'])
+            ])
+            group_ids.extend(livechat_groups.ids)
+            
+            # VoIP (Phone calls with customers)
+            voip_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'VoIP'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(voip_groups.ids)
+            
+            # Invoicing (Sales need to see invoices)
+            invoicing_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Invoicing'),
+                ('name', 'in', ['Billing'])
+            ])
+            group_ids.extend(invoicing_groups.ids)
+            
+            # Sign (For sales contracts and quotes)
+            sign_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Sign'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(sign_groups.ids)
+            
+            # Documents (Sales documents management)
+            documents_groups = self.env['res.groups'].search([
+                ('category_id.name', '=', 'Documents'),
+                ('name', 'in', ['User'])
+            ])
+            group_ids.extend(documents_groups.ids)
+            
+            # Additional sales groups by XML ID (more reliable)
             sales_xmlid_groups = [
-                'sales_team.group_sale_salesman',           # Salesperson
-                'sales_team.group_sale_salesman_all_leads', # See All Leads
+                'sales_team.group_sale_salesman',               # Salesperson
+                'sales_team.group_sale_salesman_all_leads',     # See All Leads
+                'sales_team.group_sale_manager',                # Sales Manager (optional)
+                'sale.group_sale_user',                         # Sales User
+                'crm.group_use_lead',                           # Use Leads
+                'crm.group_use_recurring_revenues',             # Recurring Revenues
+                'point_of_sale.group_pos_user',                 # POS User
+                'sale_subscription.group_sale_subscription',    # Subscriptions
+                'website_sale.group_website_restricted_editor', # eCommerce Editor
+                'mass_mailing.group_mass_mailing_user',         # Email Marketing User
+                'mass_mailing_sms.group_mass_mailing_sms_user', # SMS Marketing User
+                'social_marketing.group_social_marketing_user', # Social Marketing User
+                'event.group_event_user',                       # Event User
+                'survey.group_survey_user',                     # Survey User
+                'appointment.group_appointment_user',           # Appointment User
+                'helpdesk.group_helpdesk_user',                 # Helpdesk User
+                'im_livechat.im_livechat_group_user',          # Live Chat User
+                'voip.group_voip_user',                        # VoIP User
+                'sale_rental.group_rental_user',               # Rental User
+                'marketing_automation.group_marketing_automation_user', # Marketing Automation
+                'account.group_account_invoice',                # Show Invoices
             ]
             
             for xmlid in sales_xmlid_groups:
