@@ -672,6 +672,10 @@ class HrCreateUserWizard(models.TransientModel):
                 "message": f"User updated successfully for {self.employee_id.name}",
                 "type": "success",
                 "sticky": False,
+                "next": {
+                    "type": "ir.actions.client",
+                    "tag": "reload",
+                },
             },
         }
 
