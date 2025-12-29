@@ -2,7 +2,7 @@
 
 document.addEventListener('click', async (ev) => {
 
-    if(!window.location.href.includes('/odoo/org-chart/new') && !window.location.href.includes('/odoo/employees/new')) return
+    if(!window.location.href.includes('/odoo/org-chart') && !window.location.href.includes('/odoo/employees/new')) return
     // 1. Target the Save buttons only
     const saveBtn = ev.target.closest('.o_form_button_save, .o_form_button_save_new');
     if (!saveBtn) return;
