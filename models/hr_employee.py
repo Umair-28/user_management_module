@@ -4,6 +4,16 @@ from odoo.exceptions import UserError
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
+    # Store the user roles assigned to this employee
+    x_user_role_ids = fields.Many2many(
+        'hr.user.role',
+        'hr_employee_user_role_rel',
+        'employee_id',
+        'role_id',
+        string='User Roles',
+        help='The roles assigned to this employee\'s user account'
+    )
+
     def action_unlink_user(self):
         """Unlink and delete the user from the employee"""
         self.ensure_one()
