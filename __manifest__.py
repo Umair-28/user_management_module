@@ -31,7 +31,7 @@ Features:
     ],
     'assets': {
         'web.assets_backend': [
-            'hr_user_management/static/src/js/block_save.js',
+            'user_management_module/static/src/js/block_save.js',
         ],
     },
     "application": False,
