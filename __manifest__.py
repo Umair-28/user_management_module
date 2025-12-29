@@ -25,10 +25,15 @@ Features:
     ],
     "data": [
         "security/ir.model.access.csv",
-        # "data/hr_user_role_data.xml",
+        "data/hr_user_roles.xml",
         "views/create_user_wizard_view.xml",
         "views/hr_employee_view.xml",
     ],
+    'assets': {
+        'web.assets_backend': [
+            'hr_user_management/static/src/js/block_save.js',
+        ],
+    },
     "application": False,
     "installable": True,
     "auto_install": False,

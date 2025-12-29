@@ -7,15 +7,17 @@
             <form string="Create User">
                 <group>
                     <field name="employee_id"/>
-                    <field name="login" placeholder="e.g., user@company.com"/>
+                    <field name="login" placeholder="e.g., user@company.com" required="1"/>
                     <field name="password" password="True"/>
                     <field name="confirm_password" password="True"/>
                 </group>
                 <group string="Role Selection">
-                    <field name="user_role" widget="radio"/>
+                    <!-- <field name="user_role" widget="radio"/> -->
+                    <field name="user_role_ids" widget="many2many_checkboxes"/>
+
                 </group>
                 <group string="Access Rights (Auto-assigned based on role)">
-                    <field name="groups_id" widget="many2many_tags" nolabel="1" readonly="1"/>
+                    <field name="groups_id" widget="many2many_tags" nolabel="1"/>
                 </group>
                 <footer>
                     <button

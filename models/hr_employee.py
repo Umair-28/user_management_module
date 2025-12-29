@@ -1,4 +1,4 @@
-from odoo import models, api
+from odoo import models, api, fields
 from odoo.exceptions import UserError
 
 class HrEmployee(models.Model):

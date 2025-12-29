@@ -1,0 +1,31 @@
+<odoo>
+    <record id="role_hr" model="hr.user.role">
+        <field name="name">HR Manager</field>
+        <field name="code">hr</field>
+    </record>
+
+    <record id="role_accountant" model="hr.user.role">
+        <field name="name">Accountant</field>
+        <field name="code">accountant</field>
+    </record>
+
+    <record id="role_sales" model="hr.user.role">
+        <field name="name">Sales Manager</field>
+        <field name="code">sales</field>
+    </record>
+
+    <record id="role_purchase" model="hr.user.role">
+        <field name="name">Purchase Manager</field>
+        <field name="code">purchase</field>
+    </record>
+
+    <record id="role_warehouse" model="hr.user.role">
+        <field name="name">Warehouse Manager</field>
+        <field name="code">warehouse</field>
+    </record>
+
+    <record id="role_inventory" model="hr.user.role">
+        <field name="name">Inventory User</field>
+        <field name="code">inventory</field>
+    </record>
+</odoo>
