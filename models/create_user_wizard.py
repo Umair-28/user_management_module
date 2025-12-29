@@ -10,7 +10,7 @@ class HrCreateUserWizard(models.TransientModel):
     existing_user_id = fields.Many2one("res.users", string="Existing User", readonly=True)
     is_update_mode = fields.Boolean(compute="_compute_is_update_mode", store=False)
     
-    login = fields.Char(required=True)
+    login = fields.Char(string="Login/Email",required=True)
     password = fields.Char(string="Password")
     confirm_password = fields.Char(string="Confirm Password")
     user_role_ids = fields.Many2many("hr.user.role", string="User Roles", required=True)
